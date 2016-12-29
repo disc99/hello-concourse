@@ -27,3 +27,13 @@ jobs:
   - put: result # 出力結果のGitのpush
     params:
       repository: updated-result
+
+- name: show-result-job # 新規ジョブ
+  public: true
+  plan:
+  - get: hello    
+  - get: result
+    trigger: true
+    passed: [ hello-job ]
+  - task: show-result
+    file: hello/show-result.yml
