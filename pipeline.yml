@@ -5,6 +5,12 @@ resources:
   type: git
   source:
     uri: https://github.com/disc99/hello-concourse.git
+- name: result
+  type: git
+  source:
+    uri: git@gist.github.com:33490110580cc9a89c7dde10ba897de7.git
+    private_key: {{github-private-key}}
+    branch: master
 
 # Jobの定義
 jobs:
@@ -13,5 +19,11 @@ jobs:
   plan:
   - get: hello
     trigger: true # Resourceに変更があれば自動でジョブを実行するかどうか
+  - get: result # 出力結果のGitをpull (次に定義する)
   - task: run-hello
     file: hello/hello.yml
+  - task: commit-log # 出力結果ファイルをGitにコミットするTask
+    file: hello/commit-log.yml
+  - put: result # 出力結果のGitのpush
+    params:
+      repository: updated-result
